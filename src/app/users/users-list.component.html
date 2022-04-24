@@ -1,0 +1,50 @@
+<div>
+  <div mat-form-field>
+    <input matInput (keyup)="applyFilter($event.target)" placeholder="Filter">
+  </div>
+</div>
+
+<div>
+
+  <mat-table #table [dataSource]="dataSource" matSort>
+
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Name </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.name}} </mat-cell>
+    </ng-container>
+
+    <!-- Height Column -->
+    <ng-container matColumnDef="height">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Height </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.height}} </mat-cell>
+    </ng-container>
+
+    <!-- Mass Column -->
+    <ng-container matColumnDef="mass">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Mass </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.mass}} </mat-cell>
+    </ng-container>
+
+    <!-- Created Column -->
+    <ng-container matColumnDef="created">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Created </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.created}} </mat-cell>
+    </ng-container>
+
+    <!-- Edited Column -->
+    <ng-container matColumnDef="edited">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Edited </mat-header-cell>
+      <mat-cell *matCellDef="let element"> {{element.edited}} </mat-cell>
+    </ng-container>
+
+    <!-- Planet Info Column -->
+    <ng-container matColumnDef="homeworld">
+      <mat-header-cell *matHeaderCellDef mat-sort-header> Planet Name </mat-header-cell>
+      <mat-cell class="planet-name" *matCellDef="let element" (click)="displayPlanetDetails(element.homeworld)"> Planet Info </mat-cell>
+    </ng-container>
+
+    <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>
+    <mat-row *matRowDef="let row; columns: displayedColumns;"></mat-row>
+  </mat-table>
+</div>
