@@ -1,5 +1,4 @@
 export interface UserModel {
-    results: [];
     name: string; 
     height: string; 
     mass: string; 
@@ -16,4 +15,10 @@ export interface UserModel {
     created: string;
     edited: string;
     url: string;
+}
+export interface UsersModel {
+    results: UserModel[];
+    count: number;
+    previous?: string;
+    next?: string;
 }

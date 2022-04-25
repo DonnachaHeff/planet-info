@@ -1,4 +1,4 @@
-import { UserModel } from './../models/user.model';
+import { UsersModel } from './../models/user.model';
 import { UsersService } from './../services/users.service';
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatSort } from "@angular/material/sort";
@@ -23,17 +23,17 @@ export class UsersListComponent implements OnInit {
     @ViewChild(MatSort) sort: MatSort;
 
     displayedColumns = ['name', 'height', 'mass', 'created', 'edited', 'homeworld'];
-    users = {results: []};
+    users: UsersModel;
     dataSource: any;
 
     ngOnInit(): void {
-        this.getUsers().subscribe(results => {
+        this.getUsers().subscribe(() => {
             this.dataSource = new MatTableDataSource(this.users.results);
             this.dataSource.sort = this.sort;
         });
     }
 
-    getUsers(): Observable<UserModel> {
+    getUsers(): Observable<UsersModel> {
         return this.userService.getUsers().pipe(
             tap(users => {
                 this.users = users;

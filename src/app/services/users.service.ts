@@ -1,4 +1,4 @@
-import { UserModel } from './../models/user.model';
+import { UsersModel } from './../models/user.model';
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { Observable } from 'rxjs/internal/Observable';
@@ -11,7 +11,7 @@ export class UsersService {
         private http: HttpClient
     ){}
 
-    getUsers(): Observable<UserModel> {
-        return this.http.get<UserModel>('https://swapi.dev/api/people/');
+    getUsers(): Observable<UsersModel> {
+        return this.http.get<UsersModel>('https://swapi.dev/api/people/');
     }
 }
