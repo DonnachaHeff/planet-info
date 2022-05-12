@@ -17,7 +17,7 @@
     <mat-spinner class="spinner"></mat-spinner>
   </div>
 
-  <mat-table *ngIf="!isLoading" #table [dataSource]="dataSource" matSort>
+  <mat-table *ngIf="!isLoading" #table [dataSource]="dataSource" matSort (matSortChange)="sortData($event)">
 
     <!-- Name Column -->
     <ng-container matColumnDef="name">

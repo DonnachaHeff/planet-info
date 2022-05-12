@@ -1,9 +1,9 @@
-import { Observable } from 'rxjs/internal/Observable';
 import { Component, OnInit, ViewChild } from "@angular/core";
-import { MatSort } from "@angular/material/sort";
+import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
 import { map, merge, retry, shareReplay } from 'rxjs';
+import { Observable } from 'rxjs/internal/Observable';
 import { UsersModel, UserModel } from './../models/user.model';
 import { UsersService } from './../services/users.service';
 import { PlanetInfoComponent } from '../planets/planets-info.component';
@@ -34,7 +34,6 @@ export class UsersListComponent implements OnInit {
     ngOnInit(): void {
         this.getUsers().subscribe(() => {
             this.dataSource = new MatTableDataSource(this.users?.results);
-            this.dataSource.sort = this.sort;
         }, (error) => {
             console.log("Failed to get Users Details: " + error);
         });
@@ -91,13 +90,35 @@ export class UsersListComponent implements OnInit {
             }), shareReplay(1);
 
             this.dataSource = new MatTableDataSource(this.users.results);
-            
-            // bug - sorting stops working after changing page
-            this.dataSource.sort = this.sort;
 
             this.isLoading = false;
         }, (error) => {
             console.log("Getting User Details Failed" + error);
         });
     }
+
+    sortData(sort: Sort): void {
+        const data = this.users.results.slice();
+
+        if (!sort.active || sort.direction == '') {
+            return;
+        }
+
+        this.dataSource = data.sort((a, b) => {
+            let isAsc = sort.direction == 'asc';
+            switch (sort.active) {
+                case 'name': return this.compare(a.name, b.name, isAsc);
+                case 'height': return this.compare(+a.height, +b.height, isAsc);
+                case 'mass': return this.compare(+a.mass, +b.mass, isAsc);
+                case 'created': return this.compare(+a.created, +b.created, isAsc);
+                case 'edited': return this.compare(+a.edited, +b.edited, isAsc);
+                case 'homeworldName': return this.compare(+a.homeworldName, +b.homeworldName, isAsc); // bug - not sorting
+                default: return 0;
+            }
+        });
+    }
+
+    private compare(a: string | number, b: string | number, isAsc: boolean): number {
+        return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    }    
 }
