@@ -11,7 +11,14 @@ export class UsersService {
         private http: HttpClient
     ){}
 
-    getUsers(): Observable<UsersModel> {
+    getUsers(pageNumber?: number): Observable<UsersModel> {
+        if (pageNumber) {
+            return this.http.get<UsersModel>(`https://swapi.dev/api/people/?page=${pageNumber}`);
+        }
         return this.http.get<UsersModel>('https://swapi.dev/api/people/');
+    }
+
+    getNextUsers(userPage: string): Observable<UsersModel> {
+        return this.http.get<UsersModel>(userPage);
     }
 }

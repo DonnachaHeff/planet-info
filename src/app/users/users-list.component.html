@@ -3,10 +3,21 @@
     <input matInput (keyup)="applyFilter($event.target)" placeholder="Filter">
   </div>
 </div>
+<div>
+  <mat-paginator 
+            [length]="totalNumberOfUsers"
+            [pageSize]="10"
+            (page)="changePage($event)">
+  </mat-paginator>
+</div>
 
 <div>
 
-  <mat-table #table [dataSource]="dataSource" matSort>
+  <div *ngIf="isLoading">
+    <mat-spinner class="spinner"></mat-spinner>
+  </div>
+
+  <mat-table *ngIf="!isLoading" #table [dataSource]="dataSource" matSort>
 
     <!-- Name Column -->
     <ng-container matColumnDef="name">
@@ -29,19 +40,19 @@
     <!-- Created Column -->
     <ng-container matColumnDef="created">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Created </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.created}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.created | date: 'fullDate'}} </mat-cell>
     </ng-container>
 
     <!-- Edited Column -->
     <ng-container matColumnDef="edited">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Edited </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.edited}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.edited | date: 'fullDate'}} </mat-cell>
     </ng-container>
 
     <!-- Planet Info Column -->
-    <ng-container matColumnDef="homeworld">
+    <ng-container matColumnDef="homeworldName">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Planet Name </mat-header-cell>
-      <mat-cell class="planet-name" *matCellDef="let element" (click)="displayPlanetDetails(element.homeworld)"> Planet Info </mat-cell>
+      <mat-cell class="planet-name" *matCellDef="let element" (click)="displayPlanetDetails(element.homeworld)"> {{ element.homeworldName }} </mat-cell>
     </ng-container>
 
     <mat-header-row *matHeaderRowDef="displayedColumns"></mat-header-row>

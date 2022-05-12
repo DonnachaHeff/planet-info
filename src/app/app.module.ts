@@ -14,6 +14,8 @@ import { HttpClientModule } from '@angular/common/http';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatDialogModule } from '@angular/material/dialog';
 import { PlanetsService } from './services/planets.service';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 @NgModule({
   declarations: [
@@ -31,6 +33,8 @@ import { PlanetsService } from './services/planets.service';
     HttpClientModule,
     BrowserAnimationsModule,
     MatDialogModule,
+    MatPaginatorModule,
+    MatProgressSpinnerModule,
   ],
   providers: [
     UsersService, 

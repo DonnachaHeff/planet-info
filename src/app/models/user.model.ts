@@ -15,6 +15,7 @@ export interface UserModel {
     created: string;
     edited: string;
     url: string;
+    homeworldName: string;
 }
 export interface UsersModel {
     results: UserModel[];

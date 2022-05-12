@@ -1,3 +1,7 @@
 .planet-name:hover {
   cursor: pointer;
 }
+
+.spinner {
+  margin: 0 auto;
+}
