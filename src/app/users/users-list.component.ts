@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { tap, map } from 'rxjs';
+import { map, merge, retry } from 'rxjs';
 import { UsersModel, UserModel } from './../models/user.model';
 import { UsersService } from './../services/users.service';
 import { PlanetInfoComponent } from '../planets/planets-info.component';
@@ -32,26 +32,25 @@ export class UsersListComponent implements OnInit {
 
     ngOnInit(): void {
         this.getUsers().subscribe(() => {
-            this.users.results.forEach(user => {
-                this.getPlanetName(user.homeworld).subscribe(() => {
-                    user.homeworldName = this.planetName;
-                });
-            });
-
-            this.dataSource = new MatTableDataSource(this.users.results);
+            this.dataSource = new MatTableDataSource(this.users?.results);
             this.dataSource.sort = this.sort;
+        }, (error) => {
+            console.log("Failed to get Users Details: " + error);
         });
     }
 
     getUsers() {
-        return this.userService.getUsers().pipe(
-            tap(users => {
-                this.users = users;
-                this.totalNumberOfUsers = users.count;
-            }, error => {
-                console.log(error);
-            })
-        )
+        return merge(this.userService.getUsers().pipe(retry(3), map(res => {
+                    this.users = res;
+                    this.totalNumberOfUsers = res.count;
+                    return res;
+        }))).pipe(map(res => {
+            res.results.forEach(x => {
+                this.getPlanetName(x.homeworld).subscribe(() => {
+                    x.homeworldName = this.planetName;
+                });
+            });
+        }));
     }
 
     displayPlanetDetails(homeworld: string): void {
@@ -63,7 +62,7 @@ export class UsersListComponent implements OnInit {
     }
 
     getPlanetName(homeworldUrl: string) {
-        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(map(result => {
+        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(retry(3), map(result => {
             this.planetName = result.name;
         }));
     }
@@ -83,12 +82,17 @@ export class UsersListComponent implements OnInit {
             this.users.results.forEach(user => {
                 this.getPlanetName(user.homeworld).subscribe(() => {
                     user.homeworldName = this.planetName;
+                }, (error) => {
+                    console.log("Getting Planet Name Failed: " + error);
+                    
                 });
             });
 
             this.dataSource = new MatTableDataSource(this.users.results);
             this.dataSource.sort = this.sort;
             this.isLoading = false;
+        }, (error) => {
+            console.log("Getting User Details Failed" + error);
         });
     }
 }
