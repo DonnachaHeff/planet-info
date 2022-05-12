@@ -1,3 +1,4 @@
+import { Observable } from 'rxjs/internal/Observable';
 import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from '@angular/material/table';
@@ -39,7 +40,7 @@ export class UsersListComponent implements OnInit {
         });
     }
 
-    getUsers() {
+    getUsers(): Observable<void> {
         return merge(this.userService.getUsers().pipe(retry(3), map(res => {
                     this.users = res;
                     this.totalNumberOfUsers = res.count;
@@ -62,7 +63,7 @@ export class UsersListComponent implements OnInit {
         });
     }
 
-    getPlanetName(homeworldUrl: string) {
+    getPlanetName(homeworldUrl: string): Observable<void> {
         return this.planetsService.getPlanetDetails(homeworldUrl).pipe(retry(3), map(result => {
             this.planetName = result.name;
         }), shareReplay(1));
@@ -74,7 +75,7 @@ export class UsersListComponent implements OnInit {
         this.dataSource.filter = filterValue;
     }
 
-    changePage(pageEvent: any) {
+    changePage(pageEvent: any): void {
         this.currentPage = pageEvent.pageIndex+1;
         this.isLoading = true;
 
@@ -90,6 +91,8 @@ export class UsersListComponent implements OnInit {
             }), shareReplay(1);
 
             this.dataSource = new MatTableDataSource(this.users.results);
+            
+            // bug - sorting stops working after changing page
             this.dataSource.sort = this.sort;
 
             this.isLoading = false;
