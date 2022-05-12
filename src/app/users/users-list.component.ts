@@ -2,7 +2,7 @@ import { Component, OnInit, ViewChild } from "@angular/core";
 import { MatSort } from "@angular/material/sort";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { map, merge, retry } from 'rxjs';
+import { map, merge, retry, shareReplay } from 'rxjs';
 import { UsersModel, UserModel } from './../models/user.model';
 import { UsersService } from './../services/users.service';
 import { PlanetInfoComponent } from '../planets/planets-info.component';
@@ -44,13 +44,14 @@ export class UsersListComponent implements OnInit {
                     this.users = res;
                     this.totalNumberOfUsers = res.count;
                     return res;
-        }))).pipe(map(res => {
+        }), shareReplay(1)))
+        .pipe(map(res => {
             res.results.forEach(x => {
                 this.getPlanetName(x.homeworld).subscribe(() => {
                     x.homeworldName = this.planetName;
                 });
             });
-        }));
+        }), shareReplay(1));
     }
 
     displayPlanetDetails(homeworld: string): void {
@@ -64,7 +65,7 @@ export class UsersListComponent implements OnInit {
     getPlanetName(homeworldUrl: string) {
         return this.planetsService.getPlanetDetails(homeworldUrl).pipe(retry(3), map(result => {
             this.planetName = result.name;
-        }));
+        }), shareReplay(1));
     }
 
     applyFilter(filterValue: any): void {
@@ -85,11 +86,12 @@ export class UsersListComponent implements OnInit {
                 }, (error) => {
                     console.log("Getting Planet Name Failed: " + error);
                     
-                });
-            });
+                }), shareReplay(1);
+            }), shareReplay(1);
 
             this.dataSource = new MatTableDataSource(this.users.results);
             this.dataSource.sort = this.sort;
+
             this.isLoading = false;
         }, (error) => {
             console.log("Getting User Details Failed" + error);
