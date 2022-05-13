@@ -30,6 +30,7 @@ export class UsersListComponent implements OnInit {
     currentPage: number;
     totalNumberOfUsers: number;
     isLoading = false;
+    filterValue: string = '';
 
     ngOnInit(): void {
         this.getUsers().subscribe(() => {
@@ -69,12 +70,17 @@ export class UsersListComponent implements OnInit {
     }
 
     applyFilter(filterValue: any): void {
-        filterValue = filterValue.value.trim(); 
-        filterValue = filterValue.toLowerCase();
-        this.dataSource.filter = filterValue;
+        this.filterValue = filterValue.value.trim().toLowerCase();
+
+        // filters only by name
+        const users = this.users.results.filter(x => x.name.toLowerCase().includes(this.filterValue))
+        this.dataSource.data = users;
     }
 
     changePage(pageEvent: any): void {
+        // reset filter on page change
+        this.filterValue = '';
+
         this.currentPage = pageEvent.pageIndex+1;
         this.isLoading = true;
 
@@ -98,27 +104,25 @@ export class UsersListComponent implements OnInit {
     }
 
     sortData(sort: Sort): void {
-        const data = this.users.results.slice();
-
         if (!sort.active || sort.direction == '') {
             return;
         }
 
-        this.dataSource = data.sort((a, b) => {
+        this.dataSource.data = this.dataSource.data.sort((a, b) => {
             let isAsc = sort.direction == 'asc';
             switch (sort.active) {
                 case 'name': return this.compare(a.name, b.name, isAsc);
                 case 'height': return this.compare(+a.height, +b.height, isAsc);
                 case 'mass': return this.compare(+a.mass, +b.mass, isAsc);
-                case 'created': return this.compare(+a.created, +b.created, isAsc);
-                case 'edited': return this.compare(+a.edited, +b.edited, isAsc);
+                case 'created': return this.compare(new Date(+a.created), new Date(+b.created), isAsc);
+                case 'edited': return this.compare(new Date(+a.edited), new Date(+b.edited), isAsc);
                 case 'homeworldName': return this.compare(+a.homeworldName, +b.homeworldName, isAsc); // bug - not sorting
                 default: return 0;
             }
         });
     }
 
-    private compare(a: string | number, b: string | number, isAsc: boolean): number {
+    private compare(a: string | number | Date, b: string | number | Date, isAsc: boolean): number {
         return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
     }    
 }
