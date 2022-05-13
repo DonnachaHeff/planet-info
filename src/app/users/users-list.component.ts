@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewChild } from "@angular/core";
+import { PageEvent } from '@angular/material/paginator';
+import { Component, OnDestroy, OnInit, ViewChild } from "@angular/core";
 import { MatSort, Sort } from "@angular/material/sort";
 import { MatTableDataSource } from '@angular/material/table';
 import { MatDialog } from '@angular/material/dialog';
-import { map, merge, retry, shareReplay } from 'rxjs';
-import { Observable } from 'rxjs/internal/Observable';
+import { map, merge, retry, shareReplay, Observable, Subscription } from 'rxjs';
 import { UsersModel, UserModel } from './../models/user.model';
 import { UsersService } from './../services/users.service';
 import { PlanetInfoComponent } from '../planets/planets-info.component';
@@ -14,7 +14,7 @@ import { PlanetsService } from '../services/planets.service';
     templateUrl: './users-list.component.html',
     styleUrls: ['./users-list.component.css']
 })
-export class UsersListComponent implements OnInit {
+export class UsersListComponent implements OnInit, OnDestroy {
     constructor(
         private userService: UsersService,
         private planetsService: PlanetsService,
@@ -32,27 +32,35 @@ export class UsersListComponent implements OnInit {
     isLoading = false;
     filterValue: string = '';
 
+    private readonly subscription = new Subscription();
+
     ngOnInit(): void {
+        this.subscription.add(
         this.getUsers().subscribe(() => {
             this.dataSource = new MatTableDataSource(this.users?.results);
         }, (error) => {
             console.log("Failed to get Users Details: " + error);
-        });
+        }));
     }
 
     getUsers(currentPage?: number): Observable<void> {
-        return merge(this.userService.getUsers(currentPage).pipe(retry(3), map(res => {
-                    this.users = res;
-                    this.totalNumberOfUsers = res.count;
-                    return res;
-        }), shareReplay(1)))
-        .pipe(map(res => {
-            res.results.forEach(x => {
-                this.getPlanetName(x.homeworld).subscribe(() => {
-                    x.homeworldName = this.planetName;
+            return merge(
+                this.userService.getUsers(currentPage).pipe(
+                    shareReplay(100),
+                    retry(3), 
+                    map(result => {
+                        this.users = result;
+                        this.totalNumberOfUsers = result.count;
+                        return result;
+            })))
+            .pipe(map(res => {
+                res.results.forEach(x => {
+                    this.subscription.add(
+                    this.getPlanetName(x.homeworld).subscribe(() => {
+                        x.homeworldName = this.planetName;
+                    }));
                 });
-            });
-        }), shareReplay(1));
+            }));
     }
 
     displayPlanetDetails(homeworld: string): void {
@@ -64,9 +72,12 @@ export class UsersListComponent implements OnInit {
     }
 
     getPlanetName(homeworldUrl: string): Observable<void> {
-        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(retry(3), map(result => {
+        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(
+            shareReplay(100),
+            retry(3),
+            map(result => {
             this.planetName = result.name;
-        }), shareReplay(1));
+        }));
     }
 
     applyFilter(filterValue: any): void {
@@ -77,7 +88,7 @@ export class UsersListComponent implements OnInit {
         this.dataSource.data = users;
     }
 
-    changePageAndUpdateUsers(pageEvent: any): void {
+    changePageAndUpdateUsers(pageEvent: PageEvent): void {
         // reset filter on page change
         this.filterValue = '';
 
@@ -114,4 +125,8 @@ export class UsersListComponent implements OnInit {
     private compare(a: string | number | Date, b: string | number | Date, isAsc: boolean): number {
         return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
     }    
+
+    ngOnDestroy(): void {
+        this.subscription.unsubscribe();
+    }
 }
