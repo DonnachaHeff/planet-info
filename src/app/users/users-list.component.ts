@@ -98,14 +98,14 @@ export class UsersListComponent implements OnInit {
         }
 
         this.dataSource.data = this.dataSource.data.sort((a, b) => {
-            let isAsc = sort.direction == 'asc';
+            let isAsc = sort.direction === 'asc';
             switch (sort.active) {
                 case 'name': return this.compare(a.name, b.name, isAsc);
                 case 'height': return this.compare(+a.height, +b.height, isAsc);
                 case 'mass': return this.compare(+a.mass, +b.mass, isAsc);
-                case 'created': return this.compare(new Date(+a.created), new Date(+b.created), isAsc);
-                case 'edited': return this.compare(new Date(+a.edited), new Date(+b.edited), isAsc);
-                case 'homeworldName': return this.compare(+a.homeworldName, +b.homeworldName, isAsc); // bug - not sorting
+                case 'created': return this.compare(new Date(a.created).getTime(), new Date(b.created).getTime(), isAsc);
+                case 'edited': return this.compare(new Date(a.edited).getTime(), new Date(b.edited).getTime(), isAsc);
+                case 'homeworldName': return this.compare(a.homeworldName, b.homeworldName, isAsc);
                 default: return 0;
             }
         });

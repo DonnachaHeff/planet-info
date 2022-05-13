@@ -40,13 +40,13 @@
     <!-- Created Column -->
     <ng-container matColumnDef="created">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Created </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.created | date: 'fullDate'}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.created | date: 'EEEE, dd/MM/yyyy, h:mm'}} </mat-cell>
     </ng-container>
 
     <!-- Edited Column -->
     <ng-container matColumnDef="edited">
       <mat-header-cell *matHeaderCellDef mat-sort-header> Edited </mat-header-cell>
-      <mat-cell *matCellDef="let element"> {{element.edited | date: 'fullDate'}} </mat-cell>
+      <mat-cell *matCellDef="let element"> {{element.edited | date: 'EEEE, dd/MM/yyyy, h:mm'}} </mat-cell>
     </ng-container>
 
     <!-- Planet Info Column -->

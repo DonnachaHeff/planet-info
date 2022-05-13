@@ -17,8 +17,4 @@ export class UsersService {
         }
         return this.http.get<UsersModel>('https://swapi.dev/api/people/');
     }
-
-    getNextUsers(userPage: string): Observable<UsersModel> {
-        return this.http.get<UsersModel>(userPage);
-    }
 }
