@@ -104,7 +104,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     }
 
     sortData(sort: Sort): void {
-        if (!sort.active || sort.direction == '') {
+        if (!sort.active || sort.direction === '') {
             return;
         }
 
