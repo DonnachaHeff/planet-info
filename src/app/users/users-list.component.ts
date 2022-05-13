@@ -40,8 +40,8 @@ export class UsersListComponent implements OnInit {
         });
     }
 
-    getUsers(): Observable<void> {
-        return merge(this.userService.getUsers().pipe(retry(3), map(res => {
+    getUsers(currentPage?: number): Observable<void> {
+        return merge(this.userService.getUsers(currentPage).pipe(retry(3), map(res => {
                     this.users = res;
                     this.totalNumberOfUsers = res.count;
                     return res;
@@ -77,29 +77,18 @@ export class UsersListComponent implements OnInit {
         this.dataSource.data = users;
     }
 
-    changePage(pageEvent: any): void {
+    changePageAndUpdateUsers(pageEvent: any): void {
         // reset filter on page change
         this.filterValue = '';
 
         this.currentPage = pageEvent.pageIndex+1;
         this.isLoading = true;
 
-        this.userService.getUsers(this.currentPage).subscribe((users) => {
-            this.users = users;
-            this.users.results.forEach(user => {
-                this.getPlanetName(user.homeworld).subscribe(() => {
-                    user.homeworldName = this.planetName;
-                }, (error) => {
-                    console.log("Getting Planet Name Failed: " + error);
-                    
-                }), shareReplay(1);
-            }), shareReplay(1);
-
-            this.dataSource = new MatTableDataSource(this.users.results);
-
+        this.getUsers(this.currentPage).subscribe(() => {
+            this.dataSource = new MatTableDataSource(this.users?.results);
             this.isLoading = false;
         }, (error) => {
-            console.log("Getting User Details Failed" + error);
+            console.log("Failed to get Users Details: " + error);
         });
     }
 
