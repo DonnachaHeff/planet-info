@@ -1,11 +1,13 @@
-import { UserModel, UsersModel } from './../models/user.model';
-import { Subscription } from 'rxjs';
 import { TestBed } from '@angular/core/testing';
 import { MatDialog } from '@angular/material/dialog';
+import { PageEvent } from '@angular/material/paginator';
+import { Sort } from '@angular/material/sort';
+import { of, Subscription } from 'rxjs';
+import { PlanetModel } from './../models/planet.model';
+import { UserModel, UsersModel } from './../models/user.model';
 import { PlanetsService } from '../services/planets.service';
 import { UsersService } from '../services/users.service';
 import { UsersListComponent } from './users-list.component';
-import { Sort } from '@angular/material/sort';
 
 describe('UsersListComponent', () => {
     let component: UsersListComponent;
@@ -470,6 +472,65 @@ describe('UsersListComponent', () => {
 
             // Assert
             expect(component.dataSource).toEqual(expectedResult);
+        });
+    });
+
+    describe('displayPlanetDetails', () => {
+        it('should call getPlanetDetails and open matDialog', () => {
+            // Arrange
+            const homeworld = 'https://https://swapi.dev/api/planets/1/';
+            planetsServiceSpy.getPlanetDetails.and.returnValue(of({name: 'Mars'} as PlanetModel));
+            matDialogSpy.open.and.callThrough();
+
+            // Act
+            component.displayPlanetDetails(homeworld);
+
+            // Assert
+            expect(planetsServiceSpy.getPlanetDetails).toHaveBeenCalledOnceWith(homeworld);
+            expect(matDialogSpy.open).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('changePageAndUpdateUsers', () => {
+        it('should call getUsers and getPlanetDetails, increase current page, and set expected variables', () => {
+            // Arrange
+            const expectedPageIndex = 2;
+            const pageEvent = {
+                pageIndex: 1,
+            } as PageEvent;
+            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: null}as UserModel] as UserModel[]} as UsersModel));
+            planetsServiceSpy.getPlanetDetails.and.returnValue(of({name: 'Mars'} as PlanetModel));
+
+            // Act
+            component.changePageAndUpdateUsers(pageEvent);
+
+            // Assert
+            expect(component.currentPage).toBe(2);
+            expect(component.isLoading).toBeFalsy();
+            expect(userServiceSpy.getUsers).toHaveBeenCalledOnceWith(expectedPageIndex);
+            expect(component.totalNumberOfUsers).toEqual(22);
+            expect(component.users).toEqual({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: 'Mars'}as UserModel] as UserModel[]} as UsersModel);
+            expect(component.planetName).toEqual("Mars");
+            expect(component.dataSource.data).toEqual([{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: 'Mars'}as UserModel] as UserModel[])
+        });
+    });
+
+    describe('ngOnInit', () => {
+        it('should call getUsers and getPlanetDetails, and set expected variables', () => {
+            // Arrange
+            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: null}as UserModel] as UserModel[]} as UsersModel));
+            planetsServiceSpy.getPlanetDetails.and.returnValue(of({name: 'Mars'} as PlanetModel));
+
+            // Act
+            component.ngOnInit();
+
+            // Assert
+            expect(userServiceSpy.getUsers).toHaveBeenCalledTimes(1);
+            expect(planetsServiceSpy.getPlanetDetails).toHaveBeenCalledOnceWith('https://swapi.dev/api/planets/1/')
+            expect(component.totalNumberOfUsers).toEqual(22);
+            expect(component.users).toEqual({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: 'Mars'}as UserModel] as UserModel[]} as UsersModel);
+            expect(component.planetName).toEqual("Mars");
+            expect(component.dataSource.data).toEqual([{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: 'Mars'}as UserModel] as UserModel[])
         });
     });
 });

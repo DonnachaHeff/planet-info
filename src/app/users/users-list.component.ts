@@ -43,40 +43,12 @@ export class UsersListComponent implements OnInit, OnDestroy {
         }));
     }
 
-    getUsers(currentPage?: number): Observable<void> {
-            return merge(
-                this.userService.getUsers(currentPage).pipe(
-                    shareReplay(100),
-                    retry(3), 
-                    map(result => {
-                        this.users = result;
-                        this.totalNumberOfUsers = result.count;
-                        return result;
-            })))
-            .pipe(map(res => {
-                res.results.forEach(x => {
-                    this.subscription.add(
-                    this.getPlanetName(x.homeworld).subscribe(() => {
-                        x.homeworldName = this.planetName;
-                    }));
-                });
-            }));
-    }
-
     displayPlanetDetails(homeworld: string): void {
+        this.subscription.add(
         this.planetsService.getPlanetDetails(homeworld).subscribe((homeworldDetails) => {
             this.matDialog.open(PlanetInfoComponent, {
                 data: homeworldDetails,
             });
-        });
-    }
-
-    getPlanetName(homeworldUrl: string): Observable<void> {
-        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(
-            shareReplay(100),
-            retry(3),
-            map(result => {
-            this.planetName = result.name;
         }));
     }
 
@@ -100,6 +72,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
             this.isLoading = false;
         }, (error) => {
             console.log("Failed to get Users Details: " + error);
+            this.isLoading = false;
         });
     }
 
@@ -122,11 +95,40 @@ export class UsersListComponent implements OnInit, OnDestroy {
         });
     }
 
-    private compare(a: string | number | Date, b: string | number | Date, isAsc: boolean): number {
-        return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
-    }    
-
     ngOnDestroy(): void {
         this.subscription.unsubscribe();
     }
+
+    private getUsers(currentPage?: number): Observable<void> {
+            return merge(
+                this.userService.getUsers(currentPage).pipe(
+                    shareReplay(100),
+                    retry(3), 
+                    map(result => {
+                        this.users = result;
+                        this.totalNumberOfUsers = result.count;
+                        return result;
+            })))
+            .pipe(map(res => {
+                res.results.forEach(x => {
+                    this.subscription.add(
+                    this.getPlanetName(x.homeworld).subscribe(() => {
+                        x.homeworldName = this.planetName;
+                    }));
+                });
+            }));
+    }
+
+    private getPlanetName(homeworldUrl: string): Observable<void> {
+        return this.planetsService.getPlanetDetails(homeworldUrl).pipe(
+            shareReplay(100),
+            retry(3),
+            map(result => {
+            this.planetName = result.name;
+        }));
+    }
+
+    private compare(a: string | number | Date, b: string | number | Date, isAsc: boolean): number {
+        return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
+    }    
 }
