@@ -102,7 +102,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
     private getUsers(currentPage?: number): Observable<void> {
             return merge(
                 this.userService.getUsers(currentPage).pipe(
-                    shareReplay(100),
+                    shareReplay(10),
                     retry(3), 
                     map(result => {
                         this.users = result;
@@ -121,7 +121,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
 
     private getPlanetName(homeworldUrl: string): Observable<void> {
         return this.planetsService.getPlanetDetails(homeworldUrl).pipe(
-            shareReplay(100),
+            shareReplay(20),
             retry(3),
             map(result => {
             this.planetName = result.name;
