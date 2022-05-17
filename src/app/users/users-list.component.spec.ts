@@ -266,6 +266,36 @@ describe('UsersListComponent', () => {
             expect(component.dataSource).toEqual(expectedResult);
         });
 
+        it('should sort by height in ascending order and convert string correctly', () => {
+            // Arrange
+            const expectedResult = {data: [
+                    {name: 'Larry', height: 'NaN'}, 
+                    {name: 'Dave', height: '1'}, 
+                    {name: 'Duke', height: '14'}, 
+                    {name: 'Jude', height: '32'},
+                    {name: 'Brian', height: '140.03'}, 
+                    {name: 'John', height: '2,800'},
+            ]};
+            const sort = {
+                active: 'height',
+                direction: 'asc'
+            } as Sort;
+            component.dataSource = {data: [
+                    {name: 'John', height: '2,800'},
+                    {name: 'Duke', height: '14'}, 
+                    {name: 'Brian', height: '140.03'}, 
+                    {name: 'Dave', height: '1'}, 
+                    {name: 'Jude', height: '32'},
+                    {name: 'Larry', height: 'NaN'}, 
+            ]} as any
+
+            // Act
+            component.sortData(sort);
+
+            // Assert
+            expect(component.dataSource).toEqual(expectedResult);
+        });
+
         it('should sort by mass in ascending order', () => {
             // Arrange
             const expectedResult = {data: [
@@ -309,6 +339,36 @@ describe('UsersListComponent', () => {
                     {name: 'Jude', mass: '3200'},
                     {name: 'Duke', mass: '140'}, 
                     {name: 'Dave', mass: '10'}, 
+            ]} as any
+
+            // Act
+            component.sortData(sort);
+
+            // Assert
+            expect(component.dataSource).toEqual(expectedResult);
+        });
+
+        it('should sort by mass in ascending order and convert string correctly', () => {
+            // Arrange
+            const expectedResult = {data: [
+                    {name: 'Larry', mass: 'NaN'}, 
+                    {name: 'Dave', mass: '10'}, 
+                    {name: 'Duke', mass: '140'}, 
+                    {name: 'Brian', mass: '140.03'}, 
+                    {name: 'John', mass: '2,800'},
+                    {name: 'Jude', mass: '3200'},
+            ]};
+            const sort = {
+                active: 'mass',
+                direction: 'asc'
+            } as Sort;
+            component.dataSource = {data: [
+                    {name: 'John', mass: '2,800'},
+                    {name: 'Jude', mass: '3200'},
+                    {name: 'Duke', mass: '140'}, 
+                    {name: 'Dave', mass: '10'}, 
+                    {name: 'Brian', mass: '140.03'}, 
+                    {name: 'Larry', mass: 'NaN'}, 
             ]} as any
 
             // Act

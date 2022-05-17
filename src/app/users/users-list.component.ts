@@ -85,8 +85,8 @@ export class UsersListComponent implements OnInit, OnDestroy {
             let isAsc = sort.direction === 'asc';
             switch (sort.active) {
                 case 'name': return this.compare(a.name, b.name, isAsc);
-                case 'height': return this.compare(+a.height, +b.height, isAsc);
-                case 'mass': return this.compare(+a.mass, +b.mass, isAsc);
+                case 'height': return this.compare(this.convertToNumber(a.height), this.convertToNumber(b.height), isAsc);
+                case 'mass': return this.compare(this.convertToNumber(a.mass), this.convertToNumber(b.mass), isAsc);
                 case 'created': return this.compare(new Date(a.created).getTime(), new Date(b.created).getTime(), isAsc);
                 case 'edited': return this.compare(new Date(a.edited).getTime(), new Date(b.edited).getTime(), isAsc);
                 case 'homeworldName': return this.compare(a.homeworldName, b.homeworldName, isAsc);
@@ -129,6 +129,26 @@ export class UsersListComponent implements OnInit, OnDestroy {
     }
 
     private compare(a: string | number | Date, b: string | number | Date, isAsc: boolean): number {
+        if (Number.isNaN(a)) {
+            return -1 * (isAsc ? 1 : -1);
+        }
+        if (Number.isNaN(b)) {
+            return 1 * (isAsc ? 1 : -1);
+        }
+
         return (a < b ? -1 : 1) * (isAsc ? 1 : -1);
     }    
+
+    private convertToNumber(a: string): number {
+        if (Number.isNaN(a)) {
+            return -1;
+        }
+
+        a = a.replace(/,/g, "");
+        if (a.indexOf('.') !== -1) {
+            return parseFloat(a);
+        }
+
+        return parseInt(a);
+    }
 }
