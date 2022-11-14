@@ -171,7 +171,7 @@ describe('UsersListComponent', () => {
                     {name: 'Jude'},
             ]};
             const sort = {
-                active: null,
+                active: '',
                 direction: 'asc'
             } as Sort;
             component.dataSource = {data: [
@@ -558,7 +558,7 @@ describe('UsersListComponent', () => {
             const pageEvent = {
                 pageIndex: 1,
             } as PageEvent;
-            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: null}as UserModel] as UserModel[]} as UsersModel));
+            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: undefined } as UserModel] as UserModel[]} as UsersModel));
             planetsServiceSpy.getPlanetDetails.and.returnValue(of({name: 'Mars'} as PlanetModel));
 
             // Act
@@ -578,7 +578,7 @@ describe('UsersListComponent', () => {
     describe('ngOnInit', () => {
         it('should call getUsers and getPlanetDetails, and set expected variables', () => {
             // Arrange
-            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: null}as UserModel] as UserModel[]} as UsersModel));
+            userServiceSpy.getUsers.and.returnValue(of({count: 22, results: [{name: 'Luke Skywalker', homeworld: 'https://swapi.dev/api/planets/1/', homeworldName: undefined } as UserModel] as UserModel[]} as UsersModel));
             planetsServiceSpy.getPlanetDetails.and.returnValue(of({name: 'Mars'} as PlanetModel));
 
             // Act

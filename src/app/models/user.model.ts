@@ -1,25 +1,31 @@
-export interface UserModel {
-    name: string; 
-    height: string; 
-    mass: string; 
-    hair_color: string; 
-    skin_color: string; 
-    eye_color: string; 
-    birth_year: string; 
-    gender: string; 
-    homeworld: string; 
-    films: []; 
-    species: []; 
-    vehicles: []; 
-    starships: []; 
-    created: string;
-    edited: string;
-    url: string;
-    homeworldName: string;
-}
-export interface UsersModel {
-    results: UserModel[];
-    count: number;
-    previous?: string;
-    next?: string;
-}
+import { z } from "zod";
+
+export const UserModelSchema = z.object({
+    name: z.string(), 
+    height: z.string(), 
+    mass: z.string(), 
+    hair_color: z.string(), 
+    skin_color: z.string(), 
+    eye_color: z.string(), 
+    birth_year: z.string(), 
+    gender: z.string(), 
+    homeworld: z.string(), 
+    films: z.string().array(),
+    species: z.string().array(),
+    vehicles: z.string().array(),
+    starships: z.string().array(),
+    created: z.string(),
+    edited: z.string(),
+    url: z.string(),
+    homeworldName: z.string().optional(),
+});
+
+export const UsersModelSchema = z.object({
+    results: z.array(UserModelSchema),
+    count: z.number(),
+    previous: z.string().optional().nullable(),
+    next: z.string().optional().nullable()
+});
+
+export type UserModel = z.infer<typeof UserModelSchema>;
+export type UsersModel = z.infer<typeof UsersModelSchema>;

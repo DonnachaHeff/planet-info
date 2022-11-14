@@ -81,7 +81,7 @@ export class UsersListComponent implements OnInit, OnDestroy {
             return;
         }
 
-        this.dataSource.data = this.dataSource.data.sort((a, b) => {
+        this.dataSource.data = this.dataSource.data.sort((a: any, b: any) => {
             let isAsc = sort.direction === 'asc';
             switch (sort.active) {
                 case 'name': return this.compare(a.name, b.name, isAsc);

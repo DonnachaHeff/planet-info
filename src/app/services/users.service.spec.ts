@@ -1,4 +1,6 @@
-import { TestBed } from '@angular/core/testing';
+import { of } from 'rxjs';
+import { UsersModel } from './../models/user.model';
+import { fakeAsync, TestBed, tick } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 import { UsersService } from './users.service';
 
@@ -21,26 +23,28 @@ describe('UsersService', () => {
     });
 
     describe('getUsers', () => {
-        it('should call get with expected url when pageNumber is undefined', () => {
+        it('should call get with expected url when pageNumber is undefined', fakeAsync(async () => {
             // Arrange
-            httpClientSpy.get.and.callThrough();
+            httpClientSpy.get.and.returnValue(of({} as UsersModel))
 
             // Act
             service.getUsers();
+            tick();
 
             // Assert
             expect(httpClientSpy.get).toHaveBeenCalledWith('https://swapi.dev/api/people/');
-        });
+        }));
 
-        it('should call get with expected url when pageNumber defined', () => {
+        it('should call get with expected url when pageNumber defined', fakeAsync(async () => {
             // Arrange
-            httpClientSpy.get.and.callThrough();
+            httpClientSpy.get.and.returnValue(of({} as UsersModel));
 
             // Act
             service.getUsers(2);
+            tick();
 
             // Assert
             expect(httpClientSpy.get).toHaveBeenCalledWith('https://swapi.dev/api/people/?page=2');
-        });
+        }));
     });
 });

@@ -1,7 +1,8 @@
 import { Observable } from 'rxjs/internal/Observable';
 import { Injectable } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
-import { PlanetModel } from '../models/planet.model';
+import { PlanetModel, PlanetModelSchema } from '../models/planet.model';
+import { parseResponse } from '../utils/parse-response.operator';
 
 @Injectable({
     providedIn: 'root'
@@ -12,6 +13,8 @@ export class PlanetsService {
     ){}
 
     getPlanetDetails(planetUrl: string): Observable<PlanetModel> {
-        return this.http.get<PlanetModel>(planetUrl);
+        return this.http.get<PlanetModel>(planetUrl).pipe(
+            parseResponse(PlanetModelSchema)
+        );
     }
 }

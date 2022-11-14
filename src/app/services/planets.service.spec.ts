@@ -1,5 +1,7 @@
+import { PlanetModel } from './../models/planet.model';
+import { of } from 'rxjs';
 import { PlanetsService } from './planets.service';
-import { TestBed } from '@angular/core/testing';
+import { TestBed, fakeAsync, tick } from '@angular/core/testing';
 import { HttpClient } from '@angular/common/http';
 
 describe('PlanetsService', () => {
@@ -21,16 +23,17 @@ describe('PlanetsService', () => {
     });
 
     describe('getPlanetDetails', () => {
-        it('should call get with expected url when pageNumber is undefined', () => {
+        it('should call get with expected url when pageNumber is undefined', fakeAsync(async () => {
             // Arrange
             const planetUrl = 'https://swapi.dev/api/people/?page=2';
-            httpClientSpy.get.and.callThrough();
+            httpClientSpy.get.and.returnValue(of({} as PlanetModel));
 
             // Act
             service.getPlanetDetails(planetUrl);
+            tick();
 
             // Assert
             expect(httpClientSpy.get).toHaveBeenCalledWith(planetUrl);
-        });
+        }));
     });
 });
